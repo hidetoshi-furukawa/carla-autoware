@@ -1,4 +1,5 @@
 <launch>
+  <param name="vehicle_info/wheel_base" type="double" value="10" />
 
   <!-- Vehicle Contorl -->
   <include file="$(find runtime_manager)/scripts/vehicle_socket.launch"/>
@@ -12,9 +13,12 @@
   <!-- pure_pursuit -->
   <node pkg="rostopic" type="rostopic" name="config_waypoint_follower_rostopic"
         args="pub -l /config/waypoint_follower autoware_config_msgs/ConfigWaypointFollower
-        '{ header: auto, param_flag: 1, velocity: 7.0, lookahead_distance: 4.0, lookahead_ratio: 2.0, minimum_lookahead_distance: 6.0, displacement_threshold: 0.0, relative_angle_threshold: 0.0 }' "
+        '{ header: auto, param_flag: 1, velocity: 10.0, lookahead_distance: 6.0, lookahead_ratio: 2.0, minimum_lookahead_distance: 6.0, displacement_threshold: 0.0, relative_angle_threshold: 0.0 }' "
   />
-  <include file="$(find waypoint_follower)/launch/pure_pursuit.launch"/>
+
+  <include file="$(find waypoint_follower)/launch/pure_pursuit.launch">
+	<arg name="publishes_for_steering_robot" default="True"/>
+  </include>
 
   <!-- twist_filter -->
   <include file="$(find waypoint_follower)/launch/twist_filter.launch"/>
