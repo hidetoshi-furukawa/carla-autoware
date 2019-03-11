@@ -1,0 +1,60 @@
+#!/usr/bin/env python
+#
+# Copyright (c) 2019 Intel Corporation
+#
+# This work is licensed under the terms of the MIT license.
+# For a copy, see <https://opensource.org/licenses/MIT>.
+#
+
+import scipy.misc
+
+import carla
+
+import rospy
+
+from ackermann_msgs.msg import AckermannDrive
+
+from srunner.challenge.autoagents.autonomous_agent import AutonomousAgent
+
+class AutowareAgent(AutonomousAgent):
+    def setup(self, path_to_conf_file):
+        rospy.init_node('carla_autoware_client', anonymous=True)
+        rospy.Subscriber('/tmp_ctrl', AckermannDrive, self.callback) #TODO: Review topic
+        pass
+
+    def sensors(self):
+        """
+        Define the sensor suite required by the agent
+
+        :return: a list containing the required sensors
+
+        """
+        sensors = [['sensor.camera.rgb',
+                   {'x':2.0, 'y':0.0, 'z':2.0, 'roll':0.0, 'pitch':0.0, 'yaw':0.0, 'width':800, 'height':600, 'fov':100},
+                   'front'],
+
+                   ['sensor.lidar.ray_cast',
+                    {'x': 0.0, 'y': 0.0, 'z': 2.4, 'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0, 'range': 5000, 'channels': 32, 'points_per_second': 100000, 'upper_fov': 2.0, 'lower_fov': -26.8, 'rotation_frequency': 10},
+                    'sensor'],
+
+                    ['sensor.other.gnss', {'x': 1.0, 'y': 0.0, 'z': 2.0},
+                     'GPS'],
+                   ]
+
+        return sensors
+
+    def callback(self, msg):
+        print("Received command from Autoware: {}".format(msg))
+        #TODO: store data for next run_step() execution
+
+    def run_step(self, input_data):
+
+        print("=====================>")
+        for key, val in input_data.items():
+            shape = val[1].shape
+            print("[{} -- {:06d}] with shape {}".format(key, val[0], shape))
+        print("<=====================")
+
+        control = VehicleControl()
+
+        return control
